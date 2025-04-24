@@ -25,6 +25,10 @@ function Set-Location-Up
 Set-Alias -Name .. -Value Set-Location-Up
 
 
+function Set-Location-Profile
+{
+    Set-Location (Split-Path -Path $PROFILE -Parent)
+}
 function profile
 {
     nvim $PROFILE
@@ -77,6 +81,20 @@ function vq
     }
 }
 
+function gsf
+{
+    git status --porcelain | ForEach-Object {
+        $path = $_.Substring(3)
+        if(Test-Path $path -PathType Container)
+        {
+            Get-ChildItem -Path $path -Recurse -File | ForEach-Object {Resolve-Path -Relative $_.FullName}
+        } elseif(Test-Path $path)
+        {
+            Resolve-Path -Relative $path
+        }
+    } | fzf --preview 'bat --color=always {}'`
+        --bind 'enter:become(nvim {})'
+}
 
 function iv
 {
@@ -156,6 +174,12 @@ Set-PSReadLineKeyHandler -Chord 'Ctrl+n' -ScriptBlock {
     {
         [PSConsoleReadLine]::SetCursorPosition($next)
     }
+}
+
+Set-PSReadLineKeyHandler -Chord Ctrl+g -ScriptBlock {
+    [PSConsoleReadLine]::RevertLine()
+    [PSConsoleReadLine]::Insert("gsf")
+    [PSConsoleReadLine]::AcceptLine()
 }
 
 Set-PSReadLineKeyHandler -Chord Ctrl+o -ScriptBlock {

@@ -83,6 +83,7 @@ function vq
 
 function gsf
 {
+    $temp = [System.IO.Path]::GetTempFileName()
     git status --porcelain | ForEach-Object {
         $path = $_.Substring(3)
         if(Test-Path $path -PathType Container)
@@ -92,8 +93,30 @@ function gsf
         {
             Resolve-Path -Relative $path
         }
-    } | fzf --preview 'bat --color=always {}'`
-        --bind 'enter:become(nvim {})'
+    } | fzf --preview 'git --no-pager diff {} | bat --color=always'`
+        --bind 'zero:execute(echo clean working tree)+abort'`
+        --bind 'enter:become(nvim {})'`
+        --bind 'ctrl-d:execute(git restore {})'`
+        --bind "ctrl-i:execute-silent(echo {} > $temp)+abort"`
+
+    if (Test-Path "$temp")
+    {
+        $path = (Get-Content "$temp" | Out-String).Trim('"')
+        Remove-Item "$temp"
+
+        if ($path -ne "")
+        {
+            $dir = Split-Path -Path $path -Parent
+
+            if (Test-Path $dir)
+            {
+                Set-Location $dir
+            } else
+            {
+                Write-Host "Directory does not exist: $dir"
+            }
+        }
+    }
 }
 
 function iv
@@ -158,6 +181,7 @@ Set-PSReadLineKeyHandler -Chord Ctrl+/ -ScriptBlock {
 }
 
 
+# cycle through place holders `@@`
 Set-PSReadLineKeyHandler -Chord 'Ctrl+n' -ScriptBlock {
     $line = $null
     $cursor = $null

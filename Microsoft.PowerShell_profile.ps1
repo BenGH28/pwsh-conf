@@ -17,7 +17,10 @@ Remove-Item Alias:cd -ErrorAction SilentlyContinue
 Set-PSReadLineOption -EditMode Emacs
 Set-PSReadLineKeyHandler -Chord 'Ctrl+backspace' -Function BackwardDeleteWord
 
-. "$(Split-Path -Path $PROFILE -Parent)\git.ps1"
+$UtilsPath = "$(Split-Path -Path $PROFILE -Parent)\utils\"
+Get-ChildItem -Path $UtilsPath -Filter *.ps1 | ForEach-Object {
+    . $_.FullName
+}
 
 
 function Set-Location-Up

@@ -39,7 +39,7 @@ function profile
     nvim $PROFILE
 }
 
-function ivg
+function FuzzyVimGrep
 {
     param (
         [Parameter(Mandatory=$true)][string]$pattern,
@@ -73,8 +73,9 @@ function ivg
         nvim "+call cursor(${line},${col})" $file
     }
 }
+Set-Alias -Name fvg -Value FuzzyVimGrep
 
-function vq
+function VimQuickfix
 {
     param (
         [Parameter(Mandatory=$true)][string]$term,
@@ -86,20 +87,19 @@ function vq
     if ((Get-Content $temp).Length -eq 0)
     {
         Write-Host "No matches found."
-        Remove-Item $temp
     } else
     {
         nvim -q $temp
-        Remove-Item $temp
     }
+    Remove-Item $temp
 }
+Set-Alias -Name vq -Value VimQuickfix
 
-
-function iv
+function FuzzyVim
 {
     try
     {
-        $temp = "$env:TMP\selected_path.txt"
+        $temp = [System.IO.Path]::GetTempFileName()
         # Get the selected files using fd and fzf with bat as the preview
         fd -H --type f `
             --exclude "*.bin" `
@@ -123,6 +123,7 @@ function iv
             --bind "enter:become(nvim {+})"`
             --bind "ctrl-e:become(code {+})"`
             --bind "ctrl-i:execute-silent(echo {} > $temp)+abort"`
+            --header "Press ENTER to open file in NVIM, CTRL-I to navigate to path, CTRL-E to open in vscode"`
             --preview 'bat --color=always {}'
 
         if (Test-Path "$temp")
@@ -152,7 +153,7 @@ function iv
 
 Set-PSReadLineKeyHandler -Chord Ctrl+/ -ScriptBlock {
     [PSConsoleReadLine]::RevertLine()
-    [PSConsoleReadLine]::Insert("ivg -glob '@@' -path '@@' -pattern @@")
+    [PSConsoleReadLine]::Insert("FuzzyVimGrep -glob '@@' -path '@@' -pattern @@")
     [PSConsoleReadLine]::SetCursorPosition(13)
 }
 
@@ -184,7 +185,7 @@ Set-PSReadLineKeyHandler -Chord Ctrl+g -ScriptBlock {
 
 Set-PSReadLineKeyHandler -Chord Ctrl+o -ScriptBlock {
     [PSConsoleReadLine]::RevertLine()
-    [PSConsoleReadLine]::Insert("iv")
+    [PSConsoleReadLine]::Insert("FuzzyVim")
     [PSConsoleReadLine]::AcceptLine()
 }
 

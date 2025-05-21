@@ -42,18 +42,26 @@ function profile
 function ivg
 {
     param (
-        [Parameter(Mandatory=$true)][string]$term,
-        [string]$glob = "*",
+        [Parameter(Mandatory=$true)][string]$pattern,
+        [string[]]$glob = @('!.resources/**'),
         [string]$path = "."
     )
 
-    $search = & rg `
-        --color=auto `
-        --smart-case `
-        --vimgrep `
-        --glob=$glob `
-        $term $path
-    | fzf --delimiter=":" `
+    $rgArgs = @(
+        "--color=auto",
+        "--smart-case",
+        "--vimgrep"
+    )
+    foreach ($g in $glob)
+    {
+        $rgArgs += "--glob"
+        $rgArgs += $g
+    }
+    $rgArgs += $pattern
+    $rgArgs += $path
+
+
+    $search = & rg  $rgArgs | fzf --delimiter=":" `
         --preview 'bat --color=always --style=numbers {1} --highlight-line {2} -r {2}:'`
 
     if ($search)
@@ -144,7 +152,7 @@ function iv
 
 Set-PSReadLineKeyHandler -Chord Ctrl+/ -ScriptBlock {
     [PSConsoleReadLine]::RevertLine()
-    [PSConsoleReadLine]::Insert("ivg -glob '@@' -path '@@' -term @@")
+    [PSConsoleReadLine]::Insert("ivg -glob '@@' -path '@@' -pattern @@")
     [PSConsoleReadLine]::SetCursorPosition(13)
 }
 

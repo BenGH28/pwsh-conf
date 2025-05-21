@@ -14,8 +14,9 @@ function gsf
     } | fzf --preview 'git --no-pager diff {} | bat --color=always'`
         --bind 'zero:execute(echo clean working tree)+abort'`
         --bind 'enter:become(nvim {})'`
-        --bind 'ctrl-d:execute(git restore {})'`
+        --bind 'ctrl-u:preview-up,ctrl-d:preview-down'`
         --bind "ctrl-i:execute-silent(echo {} > $temp)+abort"`
+        --header "Press CTRL-I to navigate to path, CTRL-U/D to scroll preview Up/Down"
 
     if (Test-Path "$temp")
     {

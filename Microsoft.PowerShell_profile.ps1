@@ -1,7 +1,8 @@
 using namespace Microsoft.PowerShell
-$env:PYTHONIOENCODING = "utf-8"
+$Env:PYTHONIOENCODING = "utf-8"
 $Env:EDITOR = "nvim"
 $Env:IGNITION = "C:\Program Files\Inductive Automation\Ignition"
+$Env:FZF_DEFAULT_OPTS = "--ansi"
 
 Set-Alias -Name which -Value Get-Command
 Set-Alias -Name lg -Value lazygit
@@ -121,9 +122,8 @@ function FuzzyVim
             --exclude "*resource.json" `
         | fzf --multi `
             --bind "enter:become(nvim {+})"`
-            --bind "ctrl-e:become(code {+})"`
             --bind "ctrl-i:execute-silent(echo {} > $temp)+abort"`
-            --header "Press ENTER to open file in NVIM, CTRL-I to navigate to path, CTRL-E to open in vscode"`
+            --header "Press ENTER to open file in NVIM, CTRL-I to navigate to path"`
             --preview 'bat --color=always {}'
 
         if (Test-Path "$temp")
@@ -198,9 +198,9 @@ Set-PSReadLineKeyHandler -Chord Ctrl+. -ScriptBlock {
 Set-PSReadLineKeyHandler -Key Tab -ScriptBlock { Invoke-FzfTabCompletion }
 
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
-Set-PsFzfOption -TabExpansion
+# Set-PsFzfOption -TabExpansion
 Set-PsFzfOption -EnableAliasFuzzyKillProcess
-Set-PsFzfOption -EnableAliasFuzzyScoop
+# Set-PsFzfOption -EnableAliasFuzzyScoop
 
 
 function liw

@@ -122,8 +122,9 @@ function FuzzyVim
             --exclude "*resource.json" `
         | fzf --multi `
             --bind "enter:become(nvim {+})"`
+            --bind "ctrl-o:become(code {+})"`
             --bind "ctrl-i:execute-silent(echo {} > $temp)+abort"`
-            --header "Press ENTER to open file in NVIM, CTRL-I to navigate to path"`
+            --header "Press ENTER to open file in NVIM, CTRL-I to navigate to path, CTRL-O to edit in GUI Editor"`
             --preview 'bat --color=always {}'
 
         if (Test-Path "$temp")
@@ -179,7 +180,7 @@ Set-PSReadLineKeyHandler -Chord 'Ctrl+n' -ScriptBlock {
 
 Set-PSReadLineKeyHandler -Chord Ctrl+g -ScriptBlock {
     [PSConsoleReadLine]::RevertLine()
-    [PSConsoleReadLine]::Insert("gsf")
+    [PSConsoleReadLine]::Insert("GitFuzzyStatus")
     [PSConsoleReadLine]::AcceptLine()
 }
 

@@ -1,5 +1,5 @@
 
-function gsf
+function GitFuzzyStatus
 {
     $temp = [System.IO.Path]::GetTempFileName()
     git status --porcelain | ForEach-Object {
@@ -11,7 +11,7 @@ function gsf
         {
             Resolve-Path -Relative $path
         }
-    } | fzf --preview 'git --no-pager diff {} | bat --color=always'`
+    } | fzf --preview 'git diff --color=always {}'`
         --bind 'zero:execute(echo clean working tree)+abort'`
         --bind 'enter:become(nvim {})'`
         --bind 'ctrl-u:preview-up,ctrl-d:preview-down'`

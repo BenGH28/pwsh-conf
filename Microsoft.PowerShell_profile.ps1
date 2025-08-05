@@ -1,4 +1,5 @@
 using namespace Microsoft.PowerShell
+
 $Env:PYTHONIOENCODING = "utf-8"
 $Env:EDITOR = "nvim"
 $Env:IGNITION = "C:\Program Files\Inductive Automation\Ignition"
@@ -98,11 +99,30 @@ Set-Alias -Name vq -Value VimQuickfix
 
 function FuzzyVim
 {
+    param(
+        [switch]$hidden
+    )
     try
     {
         $temp = [System.IO.Path]::GetTempFileName()
         # Get the selected files using fd and fzf with bat as the preview
-        fd -H --type f `
+        if ($hidden)
+        {
+            $files = fd -H --type f `
+            --exclude "*.bin" `
+            --exclude "*.gif" `
+            --exclude "*.png" `
+            --exclude "*.jpeg" `
+            --exclude "*.jpg" `
+            --exclude "*OneDrive*" `
+            --exclude "go" `
+            --exclude "scoop" `
+            --exclude "*resource.json" `
+        }
+        else
+        {
+
+            $files = fd -H --type f `
             --exclude "*.bin" `
             --exclude "*.gif" `
             --exclude "*.png" `
@@ -120,7 +140,8 @@ function FuzzyVim
             --exclude "go" `
             --exclude "scoop" `
             --exclude "*resource.json" `
-        | fzf --multi `
+        }
+        Write-Output $files | fzf --multi `
             --bind "enter:become(nvim {+})"`
             --bind "ctrl-o:become(code {+})"`
             --bind "ctrl-i:execute-silent(echo {} > $temp)+abort"`
